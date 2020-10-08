@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NewCompoundOrder orderName="New Compound Order"  partial_fills_handling="false">
+        <CompoundOrder orderName="1" type="2" cl_compound_id="">
+            <CompoundOrderEntry>
+                <Order orderName="regular_1_1_3" side="2" qty="5" order_type="3" duration="1" account_id="10157824" contract_id="1" is_manual="false">STP</Order>
+            </CompoundOrderEntry>
+            <CompoundOrderEntry>
+                <Order orderName="regular_1_1_4" side="2" qty="5" order_type="2" duration="1" account_id="10157824" contract_id="1" is_manual="false">LMT</Order>
+            </CompoundOrderEntry>
+            <CompoundOrderEntry>
+                <CompoundOrder orderName="1" type="2" cl_compound_id="">
+                    <CompoundOrderEntry>
+                        <Order orderName="regular_1_1_3" side="2" qty="5" order_type="3" duration="1" account_id="10157824" contract_id="1" is_manual="false">STP</Order>
+                    </CompoundOrderEntry>
+                    <CompoundOrderEntry>
+                        <Order orderName="regular_1_1_4" side="2" qty="5" order_type="2" duration="1" account_id="10157824" contract_id="1" is_manual="false">LMT</Order>
+                    </CompoundOrderEntry>
+                </CompoundOrder>
+            </CompoundOrderEntry>
+        </CompoundOrder>
+</NewCompoundOrder>

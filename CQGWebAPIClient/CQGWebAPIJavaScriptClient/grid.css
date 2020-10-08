@@ -1,0 +1,134 @@
+
+.grid {
+    margin-left: 0;
+    float: left;
+    width: 25%;
+    border: 2px darkred dotted;
+}
+
+.ordersTree {
+
+}
+
+.details {
+
+    margin-left: 46%;
+    border: 2px greenyellow dotted;
+}
+
+.button {
+    margin-top: 50px;
+    cursor: pointer;
+}
+
+.Container {
+    padding: 0;
+    margin: 0;
+}
+
+.Container li {
+    list-style-type: none;
+}
+
+.Node {
+    background: url(img/i.gif) repeat-y top left;
+    margin-left: 18px;
+    zoom: 1;
+}
+
+.IsRoot {
+    margin-left: 0;
+}
+
+.IsLast {
+    background: url(img/iHalf.gif) no-repeat;
+}
+
+.ExpandOpen .Expand {
+    background-image: url(img/expandMinus.gif);
+}
+
+.ExpandClosed .Expand {
+    background-image: url(img/expandPlus.gif);
+}
+
+.ExpandLeaf .Expand {
+    background-image: url(img/expandLeaf.gif);
+}
+
+.Content {
+    width: inherit;
+    min-height: 18px;
+    margin-left: 18px;
+    cursor: pointer;
+}
+
+* html .Content {
+    height: 18px;
+}
+
+.Expand {
+    width: 18px;
+    height: 18px;
+    float: left;
+}
+
+.ExpandLoading {
+    width: 18px;
+    height: 18px;
+    float: left;
+    background-image: url(img/expand_loading.gif);
+}
+
+.ExpandOpen .Container {
+    display: block;
+}
+
+.ExpandClosed .Container {
+    display: none;
+}
+
+.ExpandOpen .Expand, .ExpandClosed .Expand {
+    cursor: pointer;
+}
+
+.ExpandLeaf .Expand {
+    cursor: auto;
+}
+
+.SelectedElement {
+    background-color: beige;
+}
+
+button.tooltips {
+    position: relative;
+    display: inline;
+    cursor: pointer;
+}
+button.tooltips span {
+    position: absolute;
+    width:280px;
+    color: #150321;
+    background: #8eb2cd;
+    height: 60px;
+    line-height: 30px;
+    text-align: center;
+    visibility: hidden;
+    border-radius: 6px;
+}
+button.tooltips span:after {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    margin-left: -8px;
+    width: 0; height: 0;
+}
+button:hover.tooltips span {
+    visibility: visible;
+    opacity: 1;
+    top: 30px;
+    left: 50%;
+    margin-left: -141px;
+    z-index: 999;
+}

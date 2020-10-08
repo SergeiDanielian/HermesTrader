@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebAPI Time Calculator</title>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <!-- data-main attribute tells require.js to load scripts/main.js after require.js loads -->
+  <script data-main="scripts/main" src="scripts/libs/require.js"></script>
+  <script src="scripts/libs/ProtoBuf.js"></script>
+  <script src="scripts/libs/ByteBuffer.js"></script>
+  <script src="scripts/libs/Long.js"></script>
+  <!-- user defined javascript files -->
+  <script src="scripts/utctime.js"></script>
+
+</head>
+<body>
+<div>
+  <td>
+    <h1>WebAPI Time Calculator:</h1>
+
+    <p>Follow the steps to see the result:</p>
+    <ol>
+      <li>Click the "Connect" Button to make sure there is a good Connection</li>
+      <li>Enter your user name and your password, Click the "Logon" Button and see the Logon Result</li>
+      <li>Once you see the base time in logon result, calculator remembers your base time and you can logoff
+      <li>Choose your "From UTC" Time and "To UTC Time" in your local time zone</li>
+      <li>Click the "Calculate" Button see the calculated UTC time you should use</li>
+      <li>The second calculator calculates milliseconds time in serverMsg into real time</li>
+    </ol>
+    <pre>0. If you logged on somewhere else and already have the base time, copy and paste it below and continue from the
+       step 4 above: the base time looks like '2017-06-10T00:19:29'<input id="base_time_pasted" /> <button id="base_time_save" onclick="basetimeSave()">Save</button></pre>
+    <br>
+    <input id='url' size="35" value="wss://demoapi.cqg.com:443" style="display:none"/>
+    1-3. UserName: <input id='user'value="username"/>
+    Password: &nbsp;&nbsp;<input id="pass" value="pass" type="password"/>
+    <button id="connect" onclick="connect()">Connect</button>
+    <button id="disconnect" onclick="disconnect()" disabled="true">Disconnect</button>
+    <span id="state">No Connection</span>
+    <button id="logon" onclick="logon()" disabled="true">Logon</button>
+    <button id="logoff" onclick="logoff()" disabled="true">Logoff</button>
+    <br>
+    <pre id="logonresult">Logon Result:</pre>
+    <br><br>
+    4-5. Select "From UTC Time" and "To UTC Time": (enter your local time)
+    <input type="date" id="start-date" value="2017-01-01" required/>
+    <input type="time" id="start-time" value="08:00:00" required/> TO
+    <input type="date" id="end-date" value="2017-02-01" required/>
+    <input type="time" id="end-time" value="09:00:00" required/>
+    <button id="CalculateUTC" onclick="calculateUTC()">Calculate</button>
+    <p>Calculate Results:</p>
+    <pre id="fromutctime"></pre>
+    <pre id="toutctime"></pre>
+    <br><br>
+    <p>6. Type "WebAPI Time" in milliseconds and see the Real UTC/Local Time:<input id="milli-time" value=0 required/>
+        <button id="CalculateReal" onclick="calculateReal()">Calculate</button></p>
+    <p>Calculate Results:</p>
+    <pre id="utctime"></pre>
+    <pre id="localtime"></pre>
+
+    <br>
+    <p>Tips:</p>
+    <ol>
+      <li>The smallest time interval for Historical request is minutely, for Tick data request is millisecondly</li>
+      <li>This example shows the minutely request, users can send millisecondly request as well</li>
+    </ol>
+    <pre>More about Base Time:</pre>
+      <pre>
+           Users of the web API might be confused by the inclusion of “basetime” in the proto file. In order to maintain
+           non-degradable performance across thousands of connections, our API servers are designed to exploit opportunities
+           to eliminate unnecessary computation at every turn. One of the ways we do this is to reduce the integer size of
+           our time index. The Unix Epoch, or POSIX time, is January 1, 1970 UTC 00:00:00. Ordinarily, one would use a benchmark
+           such as this precise time as the starting point for the time index as is. But since our API users often need to
+           request information with at least millisecond precision, a millisecond interval index based on the Unix Epoch gives
+           us a value close to 1.5 trillion for the current time, and binary requires 64 bits to express a number that large.
+           In order to reduce the index integer to a number small enough to only require 32 bits, we need to move the benchmark
+           up to within 2 billion milliseconds (about 23 days) from the current time. Therefore, we arbitrarily reset our API
+           “basetime” about every two weeks, and publish that value when the user logs in. In order to send a request specifying
+           a time the API server can understand, one must first subtract our “basetime” as represented by the Unix Epoch millisecond
+           index from the current time represented by the Unix Epoch. The result will be the number of milliseconds that have elapsed
+           since our “basetime”. If you want to get bar data for the last hour, you need to specify the start of the last hour
+           based on this new index, so you would find the number of milliseconds to subtract from the current time index based on
+           our “basetime”. Assume it is Friday, January 6, in the last few minutes of trading, 3:11 pm Central Time. Your model
+           needs the prior two hours of 10 minute bars.
+      </pre>
+  </td>
+</div>
+</html>

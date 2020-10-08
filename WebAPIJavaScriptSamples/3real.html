@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="tabs.css" media="screen"/>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+  <!-- data-main attribute tells require.js to load scripts/main.js after require.js loads -->
+  <script data-main="scripts/main" src="scripts/libs/require.js"></script>
+  <script src="scripts/libs/ProtoBuf.js"></script>
+  <script src="scripts/libs/ByteBuffer.js"></script>
+  <script src="scripts/libs/Long.js"></script>
+  <!-- user defined javascript files -->
+  <script src="scripts/metareal.js"></script>
+</head>
+<body>
+<div>
+  <td>
+    <input id='url' size="35" value="wss://demoapi.cqg.com:443" style="display:none"/>
+    UserName: <input id='user'value=""/>
+    Password: &nbsp;&nbsp;<input id="pass" value="" type="password"/>
+    <button id="connect" onclick="connect()">Connect</button>
+    <button id="disconnect" onclick="disconnect()" disabled="true">Disconnect</button>
+    <span id="state">Connection State: No Connection</span>
+    <br>
+    <br>
+    <button id="logon" onclick="logon()" disabled="true">Logon</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <button id="logoff" onclick="logoff()" disabled="true">Logoff</button>
+    <br>
+    <br>
+    Symbol:   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id="symbol" value="EP" style="text-transform: uppercase;"/>
+    <button id="addSymbol" onclick="addSymbol()">Add</button>
+    <button id="deleteSymbol" onclick="deleteSymbol()">Delete</button>
+    <br>
+    <table id="rtSymbolsTable" class="tableScroll">
+      <thead class="theadScroll">
+        <tr><td>Symbols:</td></tr>
+      </thead>
+      <tbody id="rtSymbolsTbl" class="tbodyScroll"></tbody>
+    </table>
+    <br>
+    <button id="request" onclick="requestMetadata()" disabled="true">Metadata Request</button>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <button id="realTime" onclick="realTimedata()" disabled="true">Real Time Data Request</button>
+  </td>
+</div>
+</html>

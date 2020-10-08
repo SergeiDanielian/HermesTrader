@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>CQG WebAPI Sample</title>
+
+    <link rel="stylesheet" type="text/css" href="tabs.css" media="screen"/>
+    <link rel="stylesheet" type="text/css" href="grid.css" media="screen"/>
+
+
+    <style>
+        html,body{font:normal 0.9em calibri,calibri;}
+        #log-div {width:100%;height:300px;overflow:auto;border:1px solid #7F9DB9;}
+        #ordTableDiv{width:100%;height:300px;overflow:auto;border:1px solid #7F9DB9;}
+        #log {font-size:small;}
+        #log td {text-align:left;vertical-align:middle;}
+        #user {width:100px;}
+        #pass {width:100px;}
+        #newpass {width:100px;}
+        #onetime {width:100px;}
+        #qty {width:40px;}
+        #limitPrice {width:40px;}
+        #stopPrice {width:40px;}
+        #visibleQty {width:40px;}
+        #minVisibleQty {width:40px;}
+        #rtInstrumentInput {width:50px;}
+        #trailOffset {width:40px;}
+        #trailingPeg {width:40px;}
+        #triggerQty {width:40px;}
+    </style>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script src="http://code.highcharts.com/stock/highstock.js"></script>
+    <script src="http://code.highcharts.com/stock/modules/exporting.js"></script>
+
+    <script src="scripts/account.js"></script>
+    <script src="scripts/auxiliary.js"></script>
+    <script src="scripts/contractMetadata.js"></script>
+    <script data-main="scripts/main" src="scripts/require.js"></script>
+    <script src="scripts/orders.js"></script>
+    <script src="scripts/realTime.js"></script>
+    <script src="scripts/sessionInfo.js"></script>
+    <script src="scripts/timeAndSales.js"></script>
+    <script src="scripts/timeBars.js"></script>
+    <script src="scripts/ui.js"></script>
+    <script src="scripts/webapi.js"></script>
+    <script type="text/javascript" src="scripts/CompoundOrders.js"></script>
+
+</head>
+
+<body style="background: lightgray;">
+
+<div class="tabs" style="width:100%">
+    <ul class="tab-links">
+        <li class="active"><a href="#tab-logon">Logon</a></li>
+        <li><a href="#tab-accounts">Accounts</a></li>
+        <li><a href="#tab-metadata">Metadata</a></li>
+        <li><a href="#tab-rt">Real-Time</a></li>
+        <li><a href="#tab-ts">Time and Sales</a></li>
+        <li><a href="#tab-bars">Bars</a></li>
+        <li><a href="#tab-session-info">Session Info</a></li>
+        <li><a href="#tab-order">Order</a></li>
+    </ul>
+
+    <div class="tab-content">
+
+        <div id="tab-logon" class="tab active">
+            <table class="table">
+                <tr>
+                    <td>
+                        URL: <input id='url' size="35" value="wss://demoapi.cqg.com:443"/>
+                        <select id='url-select' onChange='onUrlSelect()'>
+                            <option>wss://demoapi.cqg.com:443</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                <td>
+                    UserName: <input id='user' value=""/>
+                    Password: <input id="pass" value="" type="password"/>
+                    One time Password: <input id="onetime" type="password"/>
+                    <button id="logon" onclick="connect()">Logon</button>
+                    <button id="logoff" onclick="logoff()">Logoff</button>
+                </td>
+                </tr>
+                <tr>
+                    <td>
+                        New Password: <input id="newpass" type="password"/>
+                        <button id="changePW" onclick="changePW()">Change PW</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div id="tab-accounts" class="tab">
+            Account:
+            <select id="accountName" onchange="onAccountSelectionChanged(this)">
+            </select>
+            <br/>
+            <table border="1">
+                <tr><td>Account_Id</td><td>Account_Name</td><td>Brokerage_Account_Id</td><td>Brokerage_Id</td></tr>
+                <tr><td id="accId"></td><td id="accName"></td><td id="brokAccId"></td><td id="brokId"></td></tr>
+            </table>
+            <br>
+            <br>
+            <table style="border-collapse:collapse; display: inline-block;" border="1">
+                <tr><td>GWAccountId</td><td id="gwAccId"></td>
+                <tr><td>GWAccountName</td><td id="gwAccName"></td></tr>
+                <tr><td>DateOfLastStatement</td><td id = "lastStatement"></td></tr>
+                <tr><td>FcmAccountID</td><td id = "fcmAccId"></td></tr>
+                <tr><td>FcmID</td><td id="fcm"></td></tr>
+                <tr><td>SalesSeriesName</td><td id = "salesSerName"></td></tr>
+                <tr><td>SalesSeriesID</td><td id = "salesSerId"></td></tr>
+            </table>
+
+        </div>
+
+        <div id="tab-metadata" class="tab">
+            <button id="requestMetadataBtn" onclick="onRequestContractMetadataClicked()" disabled>Request Contract Metadata</button>
+            <input id="cm-symbol" value="EP" style="text-transform: uppercase;">
+            <div id="metadata"></div>
+        </div>
+
+        <div id="tab-rt" class="tab" style="background-color: gray; height:270px; width: 800px">
+            <div id="SubscribedInstruments" style=" height:222px; float:left; width:250px; padding:20px;">
+                Instrument:
+                <input id="rtInstrumentInput" type="text" size="10" style="text-transform: uppercase; width:160px;" value="EP">
+                <select id="requestType" onchange="onInstrumentSubscriptionLevelChanged(this)">
+                    <option value="0">None</option>
+                    <option value="1">Trades</option>
+                    <option value="2">Trades/BBA</option>
+                    <option value="3">Trades/BBA/Volumes</option>
+                    <option value="4">Trades/BBA/DOM</option>
+                </select>
+                <button id="instrumentSubscribeBtn" disabled onclick="onInstrumentSubscribeBtnClicked()">Subscribe</button>
+                <br>
+                <input type="checkbox" id="rt-log-quotes" onclick="onRtLogQuotesClick()">Log quotes
+                <br>
+                <table id="rtSymbolsTable" class="tableScroll">
+                    <thead class="theadScroll">
+                    <tr><td>Symbols</td></tr>
+                    </thead>
+                    <tbody id="rtSymbolsTbl" class="tbodyScroll"></tbody>
+                </table>
+            </div>
+            <div id="realTimeControls" style=" height:222px; float:left; width:300px; padding-right:20">
+                <table style="width:300px; height:160px" border="1">
+                    <tr><td class="td" style="width:105px">Symbol:<td id="symbol"></tr>
+                    <tr><td>Trade:<td id="trade"></tr>
+                    <tr><td style="color:darkred">Best Ask:<td id="ask" style="color:darkred"></tr>
+                    <tr><td style="color:lightgreen">Best Bid:<td id="bid" style="color:lightgreen"></tr>
+                    <tr><td>Open:<td id="ohlc-o"></tr>
+                    <tr><td>High:<td id="ohlc-h"></tr>
+                    <tr><td>Low:<td id="ohlc-l"></tr>
+                    <tr><td>Close:<td id="ohlc-c"></tr>
+                    <tr><td>Y Settlement:<td id="yesterday-stlmnt"></tr>
+                    <tr><td>Y Close:<td id="yesterday-cl"></tr>
+                    <tr><td>Indicative open:<td id="ind-open"></tr>
+                    <tr><td>Total Volume:<td id="total-vol"></tr>
+                </table>
+            </div>
+            <table style="background: gray; height:262px; width:200px; text-align:center" border="1">
+                <tr><td style="height:20">Price</td><td>Volume</td></tr>
+                <tr><td id="domPriceAsk5" style="width:50%"></td><td style="width:50%; text-align:left" id="ask5"></td></tr>
+                <tr><td id="domPriceAsk4"></td><td style="text-align:left" id="ask4"></td></tr>
+                <tr><td id="domPriceAsk3"></td><td style="text-align:left" id="ask3"></td></tr>
+                <tr><td id="domPriceAsk2"></td><td style="text-align:left" id="ask2"></td></tr>
+                <tr><td id="domPriceAsk1"></td><td style="text-align:left" id="ask1"></td></tr>
+                <tr><td id="domPriceBid1"></td><td style="text-align:left" id="bid1"></td></tr>
+                <tr><td id="domPriceBid2"></td><td style="text-align:left" id="bid2"></td></tr>
+                <tr><td id="domPriceBid3"></td><td style="text-align:left" id="bid3"></td></tr>
+                <tr><td id="domPriceBid4"></td><td style="text-align:left" id="bid4"></td></tr>
+                <tr><td id="domPriceBid5"></td><td style="text-align:left" id="bid5"></td></tr>
+            </table>
+        </div>
+
+        <div id="tab-ts" class="tab">
+            <input id="ts-symbol" value="EP">
+            From: <input id="ts-time-from">
+            To: <input id="ts-time-to">
+            <select id="ts-level">
+                <option value="1">Trades</option>
+                <option value="3">Trades&amp;BBA</option>
+            </select>
+            <br/>
+            <button id="tsRequestBtn" onclick="requestTimeAndSales()" disabled>Request</button>
+        </div>
+
+        <div id="tab-bars" class="tab">
+            Symbol: <input id="time-bars-symbol" value="EP" style="text-transform: uppercase;">
+            <button id="barsRequestBtn" onclick="requestTimeBars()" disabled>Request</button>
+            <button id="barsSubscribeBtn" onclick="requestTimeBars(true)" disabled>Subscribe</button>
+            <button id="cancelBarsBtn" onclick="cancelTimeBars()" disabled>Cancel</button>
+            <input id="time-bars-show-chart" type="checkbox" onclick="timeBarsShowChartClick(this)">Show Chart
+            <br />
+            From: <input id="time-bars-from" />
+            To: <input id="time-bars-to" />
+            Period: <select id="time-bars-period" onChange="onTimeBarsPeriodChange()">
+            <option value="26280">3 Years</option>
+            <option value="8760">Year</option>
+            <option value="744">Month</option>
+            <option value="168">Week</option>
+            <option value="24">Day</option>
+            <option value="3">3 Hours</option>
+            <option selected value="1">Hour</option>
+        </select>
+            <br />
+            Interval: <select id="time-bars-interval">
+            <option value="1">Yearly</option>
+            <option value="2">Semi-Annually</option>
+            <option value="3">Quarterly</option>
+            <option value="4">Monthly</option>
+            <option value="5">Weekly</option>
+            <option value="6">Daily</option>
+            <option value="7">Hourly</option>
+            <option selected value="8">Minutely</option>
+        </select>
+            Units:<input id="time-bars-units" size="5" value="1" />
+            <div id="bar-chart" style="width:700px; height:400px;"></div>
+        </div>
+
+        <div id="tab-session-info" class="tab">
+            <button id="sessionInfoRequestBtn" onclick="requestSessionInfo()" disabled>Request Session Info</button>
+            <input id="session-info-symbol" value="DJI" style="text-transform: uppercase;" >
+            From: <input id="session-info-from"/>
+            To: <input id="session-info-to"/>
+            <div id="session-info"></div>
+        </div>
+
+        <div id="tab-order" class="tab">
+            <div id="orderPropertiesToPlace" style="width: 50%; height:250px; float:left; padding:5px; background-color: gray">
+                <button onclick="newOrderBtnClicked()" id="orderNewBtn" disabled style="width:100px; height: 25px">New order</button>
+                <button onclick="modifyOrder()" id="orderModifyBtn" disabled style="width:100px; height: 25px">Modify order</button>
+                <button onclick="cancelOrder()" id="orderCancelBtn" disabled style="width:100px; height: 25px">Cancel order</button>
+                &nbsp;&nbsp;Selected order: <input disabled id="orderToModifyId" style="width:200px">
+                <div>
+                    <br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Account:&nbsp;<select id="orderAccounts" style="width: 120px"></select>
+                    Instrument: <select id="orderInstruments" onchange="orderInstrumentChanged()" disabled style="width: 120px"></select>
+                    &nbsp;&nbsp;
+                    Qty:<input id="qty" disabled style="width: 85px" value="1">
+                    Type: <select id="orderType" disabled onchange="orderTypeChanged(this)">
+                    <option value="1">MKT</option>
+                    <option value="2">LMT</option>
+                    <option value="3">STP</option>
+                    <option value="4">STL</option>
+                </select>
+                    <br>
+                    <br>
+                    Instruction:
+                    <select id="execInstruction" disabled onchange="executionInstructionChanged(this)" style="width: 85px">
+                        <option value="0">None</option>
+                        <option value="1">AON</option>
+                        <option value="2">ICEBERG</option>
+                        <option value="3">QT</option>
+                        <option value="4">TRAIL</option>
+                        <option value="5">FUNARI</option>
+                        <option value="6">MIT</option>
+                    </select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    Duration: <select id="duration" disabled onchange="orderDurationChanged(this)" style="width: 85px">
+                    <option value="1">DAY</option>
+                    <option value="2">GTC</option>
+                    <option value="3">GTD</option>
+                    <option value="4">GTT</option>
+                    <option value="5">FAK</option>
+                    <option value="6">FOK</option>
+                    <option value="7">ATO</option>
+                    <option value="8">ATC</option>
+                </select>
+                    GTD/GTT: <input id="goodTill"  style="width:85px" disabled>
+                    Trailing: <select id="trailingPeg" disabled style="width: 85px">
+                    <option value="0">None</option>
+                    <option value="1">BESTBID</option>
+                    <option value="2">BESTASK</option>
+                    <option value="3">LASTTRADE</option>
+                </select>
+                </div>
+                <br>
+                <div>
+                    Limit Price:&nbsp;&nbsp;<input disabled id="limitPrice" style="width:100px"/>
+                    Stop Price:&nbsp;<input disabled id="stopPrice" style="width:100px"/>
+                    Visible Qty:&nbsp;<input disabled id="visibleQty" style="width:65px"/>
+                    Min Visible Qty: <input disabled id="minVisibleQty" style="width:55px"/>
+                </div>
+                <br>
+                <div>
+                    Trail Offset: <input disabled id="trailOffset" style="width:80px"/>
+                    Trigger Qty: <input disabled id="triggerQty" style="width:80px"/>
+                    Order Side: <select disabled id="side" style="width: 80px">
+                    <option value="0">Buy</option>
+                    <option value="1">Sell</option>
+                    </select>
+                </div>
+                <br>
+                <div>
+                    <!--Activation Time:!--> <input disabled id="activationTime" hidden="true"/>
+                    <!--Suspension Time: !--> <input disabled id="suspensionTime" hidden="true"/>
+                </div>
+                <br>
+                <div>
+                    <button onclick="buy()" id="orderBuy" disabled style="color: grey; width:100px; height: 25px">Buy</button>
+                    <button onclick="sell()" id="orderSell" disabled style="color: grey; width:100px; height: 25px">Sell</button>
+                </div>
+            </div>
+            <div id="compoundOrderPropertiesToPlace" style="display: none; width: 50%; height:250px; float:left; padding:5px; background-color: gray">
+                Client compound id <input type="text" id="clCompoundId">
+                Compound type
+                <select id="compoundOrderType">
+                    <option value="1">OPO</option>
+                    <option value="2">OCO</option>
+                </select>
+
+            </div>
+            <div style="height:250px ;padding:5px; float:left; background-color: grey">
+                <table border="1" style="background:lightgrey; border-collapse:collapse; display: inline-block; font-size: 11; text-align:center">
+                    <tr><td>Price</td><td>Volume</td></tr>
+                    <tr style="height:23px"><td id="ordDomPriceAsk5" onclick="orderDomPriceClicked(this)" style="width:100px"></td><td style="text-align:left; width:100px" id="ordAsk5"></td></tr>
+                    <tr style="height:23px"><td id="ordDomPriceAsk4" onclick="orderDomPriceClicked(this)"></td><td style="text-align:left" id="ordAsk4"></td></tr>
+                    <tr style="height:23px"><td id="ordDomPriceAsk3" onclick="orderDomPriceClicked(this)"></td><td style="text-align:left" id="ordAsk3"></td></tr>
+                    <tr style="height:23px"><td id="ordDomPriceAsk2" onclick="orderDomPriceClicked(this)"></td><td style="text-align:left" id="ordAsk2"></td></tr>
+                    <tr style="height:23px"><td id="ordDomPriceAsk1" onclick="orderDomPriceClicked(this)"></td><td style="text-align:left" id="ordAsk1"></td></tr>
+                    <tr style="height:23px"><td id="ordDomPriceBid1" onclick="orderDomPriceClicked(this)"></td><td style="text-align:left" id="ordBid1"></td></tr>
+                    <tr style="height:23px"><td id="ordDomPriceBid2" onclick="orderDomPriceClicked(this)"></td><td style="text-align:left" id="ordBid2"></td></tr>
+                    <tr style="height:23px"><td id="ordDomPriceBid3" onclick="orderDomPriceClicked(this)"></td><td style="text-align:left" id="ordBid3"></td></tr>
+                    <tr style="height:23px"><td id="ordDomPriceBid4" onclick="orderDomPriceClicked(this)"></td><td style="text-align:left" id="ordBid4"></td></tr>
+                    <tr style="height:23px"><td id="ordDomPriceBid5" onclick="orderDomPriceClicked(this)"></td><td style="text-align:left" id="ordBid5"></td></tr>
+                </table>
+            </div>
+            <div class="grid">
+                <div class="ordersTree" onclick="treeToggle(arguments[0])">
+                    <div class="Expand"></div>
+                    <div style="display: none" class="Content">
+                    </div>
+                    <ul class="Container"></ul>
+                </div>
+
+                <div class="buttons">
+                    <button onclick="createTreeStructureFromXML()" class="tooltips" id="createTreeStructureFromXML"
+                            style="color: grey; width:150px; height: 25px">Load structure<span>Recreate tree structure depends on<br> structure.xml file</span>
+                    </button>
+                    <button onclick="putExistingOrderProperties()" class="tooltips" id="populateToXML"
+                            style="color: grey; width:150px; height: 25px">Change order<span>Update properties of selected order with values from left panel</span>
+                    </button>
+                    <button onclick="removeOrder()" class="tooltips" id="removeOrder" style="color: grey; width:150px; height: 25px">
+                        Delete order<span>Delete order from compound</span>
+                    </button>
+                    <button onclick="displayXML()" class="tooltips" id="displayXML" style="color: grey; width:150px; height: 25px">XML
+                        View<span>View current XML</span>
+                    </button>
+                    <button id="placeCompoundOrder" class="tooltips" onclick="populateOrder()"
+                            style="color: grey; width:150px; height: 25px;">Place Order<span>Place compound order</span>
+                    </button>
+                </div>
+
+            </div>
+
+            <br>
+            <div id="ordTableDiv" style="background-color: lightgrey; overflow-x : hidden; color:black; height: 220px">
+                <table style="text-align:center; border-collapse:collapse; display: inline-block; width: 100%; overflow:auto" id="ordersTable" border="1">
+                    <tr><td  style="width:10%">Order Id</td>
+                        <td style="width:5%">Account<br>
+                            <select id="accountFilter" disabled style="width: 90px" onchange="filterOrdersTable()">
+                                <option value="0">ALL</option>
+                            </select>
+                        </td>
+                        <td style="width:4%">Side <br>
+                            <select id="sideFilter" disabled style="width: 60px" onchange="filterOrdersTable()">
+                                <option value="0">ALL</option>
+                                <option value="3">SELL</option>
+                                <option value="8">BUY</option>
+                            </select>
+                        </td><td style="width:4%">Qty</td>
+                        <td style="width:5%">Instrument<br>
+                            <select id="instrumentFilter" disabled style="width: 100px" onchange="filterOrdersTable()">
+                                <option value="0">ALL</option>
+                            </select>
+                        </td><td style="width:4%">Type<br>
+                            <select id="typeFilter" disabled style="width: 100px" onchange="filterOrdersTable()">
+                                <option value="0">ALL</option>
+                                <option value="1">MKT</option>
+                                <option value="2">LMT</option>
+                                <option value="3">STP</option>
+                                <option value="4">STL</option>
+                            </select>
+                        </td><td style="width:4%">Lmt Price</td><td style="width:4%">Stp Price</td>
+                        <td style="width:4%">Fill Price</td>
+                        <td style="width:4%">Duration<br>
+                            <select id="durationFilter" disabled style="width: 100px" onchange="filterOrdersTable()">
+                                <option value="0">ALL</option>
+                                <option value="1">DAY</option>
+                                <option value="2">GTC</option>
+                                <option value="3">GTD</option>
+                                <option value="4">GTT</option>
+                                <option value="5">FAK</option>
+                                <option value="5">FOK</option>
+                                <option value="5">ATO</option>
+                                <option value="5">ATC</option>
+                            </select>
+                        </td><td style="width:7%">Status<br>
+                            <select id="statusFilter" disabled style="width: 100px" onchange="filterOrdersTable()">
+                                <option value="0">ALL</option>
+                                <option value="1">IN_TRANSIT</option>
+                                <option value="2">REJECTED</option>
+                                <option value="3">WORKING</option>
+                                <option value="4">EXPIRED</option>
+                                <option value="5">IN_CANCEL</option>
+                                <option value="6">IN_MODIFY</option>
+                                <option value="7">CANCELLED</option>
+                                <option value="8">FILLED</option>
+                                <option value="9">SUSPENDED</option>
+                                <option value="10">DISCONNECTED</option>
+                                <option value="11">ACTIVEAT</option>
+                            </select>
+                        </td><td style="width:5%">GTD</td>
+                        <td style="width:5%">GTT</td><td style="width:6%">Place Time</td>
+                        <td style="width:5%">Exec Instruction<br>
+                            <select id="instructionFilter" disabled style="width: 100px" onchange="filterOrdersTable()">
+                                <option value="0">ALL</option>
+                                <option value="1">AON</option>
+                                <option value="2">ICEBERG</option>
+                                <option value="3">QT</option>
+                                <option value="4">TRAIL</option>
+                                <option value="5">FUNARI</option>
+                                <option value="6">MIT</option>
+                                <option value="7">MLM</option>
+                            </select>
+                        </td>
+                        <td style="width:4%">Visible Qty</td>
+                        <td style="width:5%">Min Visible Qty</td><td style="width:4%">Trailing Offset</td><td style="width:4%">Trailing Peg</td>
+                        <td style="width:4%">Trigger Qty</td></tr>
+                </table>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+<br>
+Log:<button onClick="clearLog()">Clear</button>
+<div id="log-div" style="height:150px">
+    <table id="log">
+        <thead>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+</body>
+</html>

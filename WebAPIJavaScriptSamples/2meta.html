@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <!-- data-main attribute tells require.js to load scripts/main.js after require.js loads -->
+  <script data-main="scripts/main" src="scripts/libs/require.js"></script>
+  <script src="scripts/libs/ProtoBuf.js"></script>
+  <script src="scripts/libs/ByteBuffer.js"></script>
+  <script src="scripts/libs/Long.js"></script>
+  <!-- user defined javascript files -->
+  <script src="scripts/metadata.js"></script>
+</head>
+<body>
+<div>
+  <td>
+    <input id='url' size="35" value="wss://demoapi.cqg.com:443" style="display:none"/>
+    UserName: <input id='user'value=""/>
+    Password: &nbsp;&nbsp;<input id="pass" value="" type="password"/>
+    <button id="connect" onclick="connect()">Connect</button>
+    <button id="disconnect" onclick="disconnect()" disabled="true">Disconnect</button>
+    <span id="state">No Connection</span>
+    <br>
+    <br>
+    Symbol:   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id="symbol" value="EP" style="text-transform: uppercase;"/>
+    <br>
+    <br>
+    <button id="logon" onclick="logon()" disabled="true">Logon</button>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <button id="logoff" onclick="logoff()" disabled="true">Logoff</button>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <button id="request" onclick="requestMetadata()" disabled="true">Metadata Request</button>
+  </td>
+</div>
+</html>

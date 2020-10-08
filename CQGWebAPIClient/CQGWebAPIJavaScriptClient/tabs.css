@@ -1,0 +1,95 @@
+/*----- Tabs -----*/
+.tabs {
+    display: block;
+}
+
+/*----- Tab Links -----*/
+.tab-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.tab-links li {
+    float: left;
+    border: 1px solid #bbb;
+    border-bottom-width: 0;
+    margin: 0;
+}
+
+.tab-links a {
+    text-decoration: none;
+    display: block;
+    background: #eee;
+    padding: 0.24em 1em;
+    color: #666;
+    width: 7em;
+    text-align: center;
+}
+
+.tab-links a:hover {
+    background: #ddd;
+}
+
+.tab-links .active {
+    border: 1px solid #888;
+    border-bottom-width: 0;
+}
+
+.tab-links .active a, .tab-links .active a:hover {
+    position: relative;
+    top: 1px;
+    background: white;
+    color: black;
+    font-weight: bold;
+}
+
+/*----- Content of Tabs -----*/
+.tab-content {
+    padding: 1em;
+    border: 1px solid #888;
+    clear: both;
+}
+
+.tab {
+    display: none;
+}
+
+.tab.active {
+    display: block;
+}
+
+/*--- orders table rows colors*/
+.orderRed {
+    color: red;
+}
+
+.orderGreen {
+    color: green;
+}
+
+.backgroundLightGrey {
+    color: lightgray;
+}
+
+.tableScroll {
+    width: 50%
+}
+
+.tbodyScroll {
+    background-color: #ddd;
+    height: 150px;
+    width: 150px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    border: 1px;
+    border-collapse: collapse;
+}
+
+.tdScroll {
+    padding: 3px 10px;
+}
+
+.theadScroll, .tbodyScroll, .trScroll, .tdScroll {
+    display: block;
+}
